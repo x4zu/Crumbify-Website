@@ -1,0 +1,255 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Crumbify design tokens.
+ * Layout + type scale derived from sundaycrumb.framer.website
+ * (Lilita One display / Inter body). Palette re-coloured:
+ *   original blue #0944ba  -> cocoa   #4a2617
+ *   original lime #e5f36d  -> butter  #f7c948
+ *   original cream #fff9ec -> oat     #fbf1e4
+ *   new accent              -> berry   #e9738f
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-lilita), "Arial Rounded MT Bold", ui-sans-serif, sans-serif;
+  --font-heading: var(--font-display);
+
+  --color-cocoa: #4a2617;
+  --color-cocoa-dark: #2b150c;
+  --color-cocoa-soft: #7a4a33;
+  --color-butter: #f7c948;
+  --color-butter-soft: #fce7a6;
+  --color-berry: #e9738f;
+  --color-berry-soft: #f8cdd6;
+  --color-oat: #fbf1e4;
+  --color-milk: #fffaf3;
+  --color-caramel: #c8692b;
+  --color-sage: #dfe5d7;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 36s linear infinite;
+  --animate-spin-slow: spin 18s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+:root {
+  --background: #fbf1e4;
+  --foreground: #2b150c;
+  --card: #fffaf3;
+  --card-foreground: #2b150c;
+  --popover: #fffaf3;
+  --popover-foreground: #2b150c;
+  --primary: #4a2617;
+  --primary-foreground: #fbf1e4;
+  --secondary: #f7c948;
+  --secondary-foreground: #2b150c;
+  --muted: #f3e4d0;
+  --muted-foreground: #7a4a33;
+  --accent: #e9738f;
+  --accent-foreground: #2b150c;
+  --destructive: #da440d;
+  --border: #e8d5bd;
+  --input: #e8d5bd;
+  --ring: #c8692b;
+  --radius: 1.25rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  /* Native smooth anchors only when Lenis is off (reduced motion). */
+  html:not(.lenis) {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-12px) rotate(var(--r, 0deg));
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Lenis base styles (from lenis/dist/lenis.css v1.3.27). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Section-level fade in / fade out while scrolling, toggled by <ScrollEffects>. */
+.section-fade {
+  opacity: 0;
+  transform: translateY(48px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.section-fade.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Server-rendered boneyard skeleton over the hero (see <HeroBones>).
+   CSS-only: fades out shortly after first paint, no JavaScript needed. */
+.hero-bones {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--color-cocoa);
+  animation: hero-bones-out 0.45s ease-out 0.5s forwards;
+}
+.hero-bones > [data-bp] {
+  display: none;
+}
+@keyframes hero-bones-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+.boneyard-build .hero-bones {
+  display: none;
+}
+
+/* boneyard CLI capture: show everything in its final state. */
+.boneyard-build *,
+.boneyard-build *::before,
+.boneyard-build *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.boneyard-build .reveal,
+.boneyard-build .section-fade {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Scroll-triggered fade-up, toggled by <Reveal>. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .section-fade {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *:not(.motion-keep),
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  /* Marquee ribbons are gentle and decorative: keep them moving, just slower. */
+  .motion-keep {
+    animation-duration: 70s !important;
+  }
+}
